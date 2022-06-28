@@ -12,7 +12,7 @@ export default observer( function ActivityDashboard() {
 
     useEffect(() => {
         if(activityRegistry.size <= 1) loadActivities();
-    }, [activityStore]) // because of [], hook only runs one time as [] are dependencies
+    }, [activityRegistry.size, loadActivities]) // because of [], hook only runs one time as [] are dependencies
 
     if(activityStore.loadingInitial) return <LoadingComponent content='Loading app' />
 
