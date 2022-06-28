@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Grid } from "semantic-ui-react";
 import LoadingComponent from "../../../app/layout/loadingComponent";
 import { useStore } from "../../../app/stores/store";
+import ActivityFilters from "./AcitivityFilters";
 import ActivityList from "./ActivityList";
 
 export default observer( function ActivityDashboard() {
@@ -24,7 +25,7 @@ export default observer( function ActivityDashboard() {
             </Grid.Column>
             <Grid.Column width='6'>
                 {/* && is used because true && expression always returns true and so on */}
-                <h2>Activity filters</h2>
+                <ActivityFilters />
             </Grid.Column>
         </Grid>
     )
