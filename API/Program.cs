@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Application.Activities;
 using Application.Core;
+using Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 

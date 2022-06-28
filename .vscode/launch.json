@@ -1,6 +1,15 @@
 {
     "version": "0.2.0",
     "configurations": [
+    {
+        "name": "Attach",
+        "port": 3000,
+        "request": "attach",
+        "skipFiles": [
+            "<node_internals>/**"
+        ],
+        "type": "chrome"
+    },
         {
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
