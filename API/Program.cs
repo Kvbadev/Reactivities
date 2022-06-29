@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Application.Activities;
 using Application.Core;
 using Domain;
+using FluentValidation.AspNetCore;
+using API.MIddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,9 @@ builder.Services.AddDbContext<DataContext>(opt =>
 
 builder.Services.AddMediatR(typeof(List.Handler).Assembly);
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+builder.Services.AddFluentValidation(config => {
+    config.RegisterValidatorsFromAssemblyContaining<Create>();
+});
 
 var app = builder.Build();
 
@@ -46,6 +51,8 @@ using (var scope = app.Services.CreateScope()) //Dispose() method ends the scope
         logger.LogError(ex, "An error occured during migration");
     }
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
