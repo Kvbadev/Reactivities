@@ -11,7 +11,7 @@ public class Delete
         public Guid Id {get; set;}
     }
 
-    public class Handler : IRequestHandler<Command, Result<Unit>>
+    public class Handler : IRequestHandler<Command, Result<Unit>?>
     {
         private readonly DataContext _context;
         public Handler(DataContext context)
@@ -19,7 +19,7 @@ public class Delete
             this._context = context;
         }
 
-        public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Unit>?> Handle(Command request, CancellationToken cancellationToken)
         {
             var activity = await _context.Activities!.FindAsync(request.Id);
             if(activity == null) return null;
