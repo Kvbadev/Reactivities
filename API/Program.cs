@@ -7,6 +7,13 @@ using Application.Core;
 using Domain;
 using FluentValidation.AspNetCore;
 using API.MIddleware;
+using Microsoft.AspNetCore.Identity;
+using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,22 +25,57 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //
 
+//Cors policy
 builder.Services.AddCors(opt => {
     opt.AddPolicy("CorsPolicy", policy => {
         policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
     });
 });
 
+//Database
 builder.Services.AddDbContext<DataContext>(opt => 
 {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+//MediatR
 builder.Services.AddMediatR(typeof(List.Handler).Assembly);
+
+//Auto Mapper
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+builder.Services.AddControllers(opt => {
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build(); //ensures that every single endpoint requires authentication
+    opt.Filters.Add(new AuthorizeFilter(policy));
+});
+
+//Fluent validation
 builder.Services.AddFluentValidation(config => {
     config.RegisterValidatorsFromAssemblyContaining<Create>();
 });
+
+//Identity
+builder.Services.AddIdentityCore<AppUser>(opt => {
+    opt.Password.RequireNonAlphanumeric = false;
+})
+    .AddEntityFrameworkStores<DataContext>()
+    .AddSignInManager<SignInManager<AppUser>>();
+
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt => {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key,
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+builder.Services.AddScoped<TokenService>(); //scoped - lifetime as long as http request
+
 
 var app = builder.Build();
 
@@ -42,8 +84,9 @@ using (var scope = app.Services.CreateScope()) //Dispose() method ends the scope
 {
     try{
         var context = scope.ServiceProvider.GetRequiredService<DataContext>(); //as soon as program consumes this scope, variables're gonna be disposed
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         await context.Database.MigrateAsync();
-        await Seed.SeedData(context);
+        await Seed.SeedData(context, userManager);
     } 
     catch(Exception ex)
     {
@@ -62,6 +105,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
