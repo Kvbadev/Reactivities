@@ -1,5 +1,8 @@
-namespace Domain;
-public class Activity
+using Application.Activities.Profiles;
+
+namespace Application.Activities;
+
+public class ActivityDto
 {
     public Guid Id { get; set; } //if name is 'Id' then it is set as primary key as default
 
@@ -15,7 +18,10 @@ public class Activity
 
     public string? Venue { get; set; }
 
+    public string? HostUsername { get; set; }
+
     public bool IsCancelled { get; set; }
 
-    public ICollection<ActivityAttendee>? Attendees { get; set; } = new List<ActivityAttendee>();
+    public ICollection<Profile>? Attendees {get; set;}
+
 }

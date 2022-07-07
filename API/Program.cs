@@ -14,6 +14,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Infrastructure.Security;
+using Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,8 @@ builder.Services.AddControllers(opt => {
     opt.Filters.Add(new AuthorizeFilter(policy));
 });
 
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+
 //Fluent validation
 builder.Services.AddFluentValidation(config => {
     config.RegisterValidatorsFromAssemblyContaining<Create>();
@@ -75,6 +79,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddScoped<TokenService>(); //scoped - lifetime as long as http request
+
+builder.Services.AddAuthorization(opt => {
+    opt.AddPolicy("IsActivityHost", policy => {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+});
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 
 var app = builder.Build();
