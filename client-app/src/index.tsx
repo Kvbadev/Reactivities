@@ -12,6 +12,10 @@ import {createBrowserHistory} from 'history';
 
 export const history = createBrowserHistory();
 
+history.listen(() => {
+  window.scrollTo(0, 0)
+}) //temporary solution!!!
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

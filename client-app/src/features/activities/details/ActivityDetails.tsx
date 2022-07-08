@@ -23,8 +23,6 @@ export default observer( function ActivityDetails() {
         return <LoadingComponent />;
     }
 
-    console.log('object');
-
     return (
         <Grid>
             <Grid.Column width={10}>
@@ -33,7 +31,7 @@ export default observer( function ActivityDetails() {
                 <ActivityDetailedChat />
             </Grid.Column>
             <Grid.Column width={6}>
-                <ActivityDetailedSidebar />
+                <ActivityDetailedSidebar activity={activity}/>
             </Grid.Column>
         </Grid>
     )
