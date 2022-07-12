@@ -1,10 +1,9 @@
-import { StringifyOptions } from "querystring";
-
 export interface Profile {
     username: string;
     displayName: string;
     image?: string;
     bio?: string;
+    photos?: Photo[];
 }
 
 export class Profile implements Profile {
@@ -14,4 +13,10 @@ export class Profile implements Profile {
         this.image = user.image;
         this.bio = user.bio;
     }
+}
+
+export interface Photo {
+    id: string;
+    url: string;
+    isMain: boolean;
 }
