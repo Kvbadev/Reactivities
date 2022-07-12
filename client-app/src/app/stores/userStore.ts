@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { history } from "../..";
 import agent from "../api/agent";
+import { Profile } from "../models/profile";
 import { User, UserFormValues } from "../models/user";
 import { store } from "./store";
 
@@ -58,6 +59,12 @@ export default class UserStore {
     setImage = (image: string) => {
         if(this.user){
             this.user.image = image;
+        }
+    }
+
+    updateDisplayname = async (updatedProfile: Partial<Profile>) => {
+        if(this.user){
+            this.user.displayName = updatedProfile.displayName as string;
         }
     }
 }

@@ -9,6 +9,7 @@ export default class ProfileStore {
     loadingProfile = false;
     uploading = false;
     loading = false;
+    updating = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -88,6 +89,21 @@ export default class ProfileStore {
         } catch(error){
             console.log(error);
             runInAction(() => this.loading = false);
+        }
+    }
+
+    updateUser = async (updatedProfile: Partial<Profile>) => {
+        this.updating = true;
+        try{
+            await agent.Profiles.updateProfile(updatedProfile);
+            runInAction(() => {
+                this.profile = {...this.profile, ...updatedProfile} as Profile;
+                console.log(this.profile);
+            })
+
+        } catch (error) {
+            runInAction(() => this.updating = false);
+            console.log(error);
         }
     }
 }
