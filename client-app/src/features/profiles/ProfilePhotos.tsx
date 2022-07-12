@@ -13,6 +13,7 @@ export default observer( function ProfilePhotos({profile}:Props) {
     const {profileStore: {isCurrentUser, uploading, deletePhoto, uploadPhoto, loading, setMainPhoto}} = useStore();
     const [addPhotoMode, setAddPhotoMode] = useState(false);
     const [target, setTarget] = useState('');
+    const {activityStore} = useStore();
 
     function handlePhotoUpload(file: Blob) {
         uploadPhoto(file).then(() => setAddPhotoMode(false));
@@ -21,6 +22,15 @@ export default observer( function ProfilePhotos({profile}:Props) {
     function handleSetMainPhoto(photo: Photo, e: SyntheticEvent<HTMLButtonElement>){
         setTarget(e.currentTarget.name);
         setMainPhoto(photo);
+
+        //apply changes in activity dashboard
+        activityStore.activityRegistry.forEach( a => {
+            const t = a.attendees.find(at => at.username === 'bob')
+            if(t) {
+                t.image = photo.url;
+                a.host!.image = photo.url;
+            }
+        })
     }
 
     function handleDeletePhoto(e: SyntheticEvent<HTMLButtonElement>, id: string){

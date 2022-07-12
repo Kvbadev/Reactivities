@@ -69,7 +69,6 @@ export default class ActivityStore {
                 this.setLoadingInitial(false);
             }
         }
-        
     }
 
     private setActivity = (activity: Activity) => {

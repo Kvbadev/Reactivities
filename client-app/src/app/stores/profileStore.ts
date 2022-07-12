@@ -1,7 +1,8 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Photo, Profile } from "../models/profile";
-import { store } from "./store";
+import ActivityStore from "./activityStore";
+import { store, useStore } from "./store";
 
 export default class ProfileStore {
     profile: Profile | null = null;
