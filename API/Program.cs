@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Infrastructure.Security;
 using Application.Interfaces;
 using Infrastructure.Photos;
+using API.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,8 @@ builder.Services.AddSwaggerGen();
 //Cors policy
 builder.Services.AddCors(opt => {
     opt.AddPolicy("CorsPolicy", policy => {
-        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000").AllowCredentials();
+        // policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
     });
 });
 
@@ -40,6 +42,9 @@ builder.Services.AddDbContext<DataContext>(opt =>
 {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+//SignalR
+builder.Services.AddSignalR();
 
 //MediatR
 builder.Services.AddMediatR(typeof(List.Handler).Assembly);
@@ -66,8 +71,8 @@ builder.Services.AddIdentityCore<AppUser>(opt => {
     .AddEntityFrameworkStores<DataContext>()
     .AddSignInManager<SignInManager<AppUser>>();
 
+//JWT token
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt => {
         opt.TokenValidationParameters = new TokenValidationParameters
@@ -77,15 +82,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false
         };
+        opt.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if(!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
-
 builder.Services.AddScoped<TokenService>(); //scoped - lifetime as long as http request
 
+//Other Authorization
 builder.Services.AddAuthorization(opt => {
     opt.AddPolicy("IsActivityHost", policy => {
         policy.Requirements.Add(new IsHostRequirement());
     });
 });
+
+
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
@@ -129,5 +149,7 @@ app.UseAuthorization();
 app.UseCors("CorsPolicy");
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chat");
 
 await app.RunAsync();

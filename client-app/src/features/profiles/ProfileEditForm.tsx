@@ -1,11 +1,9 @@
-import { Field, Form, Formik, FormikHelpers, FormikValues } from "formik";
+import { Field, Form, Formik} from "formik";
 import React from "react";
-import { Button, Header, Icon, Item, Label, Segment } from "semantic-ui-react";
+import { Button, Header, Icon, Item} from "semantic-ui-react";
 import { useStore } from "../../app/stores/store";
 import * as Yup from 'yup';
 import { observer } from "mobx-react-lite";
-import { act } from "react-dom/test-utils";
-
 interface Props {
     editMode: boolean;
     setEditMode: (value: boolean) => void;
@@ -19,8 +17,7 @@ export default observer( function ProfileEditForm({editMode, setEditMode}:Props)
     }
 
     const validationSchema = Yup.object({
-        displayName: Yup.string().required(),
-        bio: Yup.string().required()
+        displayName: Yup.string().required()
     });
 
     const initialValues = {
@@ -29,7 +26,6 @@ export default observer( function ProfileEditForm({editMode, setEditMode}:Props)
     }
 
     async function handleFormSubmit (values: any) {
-        // const user = new Profile({...profileStore.profile, ...values});
         try{
             const prevDName = profileStore.profile?.displayName;
             await profileStore.updateUser({...values});
