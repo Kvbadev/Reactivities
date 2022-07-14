@@ -20,7 +20,7 @@ public class Edit{
     {
         public Validator()
         {
-            RuleFor(p => p.ProfileDto!.DisplayName).NotEmpty();
+            // RuleFor(p => p.ProfileDto!.DisplayName).NotEmpty();
         }
     }
 
@@ -41,9 +41,15 @@ public class Edit{
             var user = await _context.Users.FirstOrDefaultAsync(p => p.UserName == _accessor.getUsername());
             if(user == null) return null;
 
+            System.Console.WriteLine("----------------");
+            System.Console.WriteLine(user.DisplayName);
+
             _mapper.Map(request.ProfileDto, user);
 
             var res = await _context.SaveChangesAsync() > 0;
+
+            System.Console.WriteLine("----------------");
+            System.Console.WriteLine(user.DisplayName);
 
             if(res) return Result<Unit>.Success(Unit.Value);
 

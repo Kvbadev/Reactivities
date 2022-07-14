@@ -11,8 +11,6 @@ public class UserAccessor : IUserAccessor
     public UserAccessor(IHttpContextAccessor httpContextAccessor)
     {
             _httpContextAccessor = httpContextAccessor;
-
-            var x = _httpContextAccessor.HttpContext!.User;
     }
 
     public string getUsername()

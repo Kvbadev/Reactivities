@@ -1,9 +1,12 @@
-import { Field, Form, Formik} from "formik";
+import { Form, Formik} from "formik";
 import React from "react";
-import { Button, Header, Icon, Item} from "semantic-ui-react";
+import { Button, Grid, Header, Item} from "semantic-ui-react";
 import { useStore } from "../../app/stores/store";
 import * as Yup from 'yup';
 import { observer } from "mobx-react-lite";
+import MyTextInput from "../../app/common/form/MyTextInput";
+import MyTextArea from "../../app/common/form/MyTextArea";
+import { Profile } from "../../app/models/profile";
 interface Props {
     editMode: boolean;
     setEditMode: (value: boolean) => void;
@@ -22,21 +25,21 @@ export default observer( function ProfileEditForm({editMode, setEditMode}:Props)
 
     const initialValues = {
         displayName: profileStore.profile?.displayName,
-        bio: profileStore.profile?.bio
+        bio: profileStore.profile?.bio || ''
     }
 
-    async function handleFormSubmit (values: any) {
+    async function handleFormSubmit (values: Partial<Profile>) {
         try{
             const prevDName = profileStore.profile?.displayName;
-            await profileStore.updateUser({...values});
-            userStore.updateDisplayname({...values});
+            profileStore.updateUser(values);
+            userStore.updateDisplayname(values);
             activityStore.activityRegistry.forEach((act) => {
                 const toChange = act.attendees.find(x => x.displayName === prevDName);
                 if(toChange){
-                    toChange.displayName = values.displayName;
+                    toChange.displayName = values.displayName as string;
                     toChange.bio = values.bio;
                 } 
-                if(act.host?.displayName === prevDName) act.host!.displayName= values.displayName;
+                if(act.host?.displayName === prevDName) act.host!.displayName= values.displayName as string;
             })
             setEditMode(false);
 
@@ -47,15 +50,15 @@ export default observer( function ProfileEditForm({editMode, setEditMode}:Props)
 
     return (
         <>
+        <Grid>
+            <Grid.Column width={16}>
+                <Header floated="left" icon='user' content={`About  ${profileStore.profile?.displayName}`} />
+                {profileStore.profile?.username === userStore.user?.username &&
+                <Button basic attached='right' color={editMode ? 'red' : 'teal'} content={editMode ? 'Cancel' : 'Edit Profile'} onClick={() => handleEdit()} floated='right'/>}
+            </Grid.Column>
+        </Grid>
             {!editMode ? (
                 <Item.Group>
-                    <Item>
-                        <Icon name='user' size="big"/>
-                        <Item.Content verticalAlign="middle">
-                            <Header as='h1'>About {profileStore.profile!.displayName}</Header>
-                        </Item.Content>
-                        <Button basic attached='right' color="teal" content='Edit Profile' onClick={() => handleEdit()}/>
-                    </Item>
                     <Item>
                         <Item.Content>
                             {profileStore.profile?.bio}
@@ -63,25 +66,22 @@ export default observer( function ProfileEditForm({editMode, setEditMode}:Props)
                     </Item>
                 </Item.Group>
             ) : (
-                <>
-                <>
-                    <Button basic attached='right' color='red' content='Cancel' onClick={() => handleEdit()}/>
-                </>
-
-                <Formik
-                    initialValues={initialValues} 
-                    onSubmit={ (values:any) => handleFormSubmit(values)}
-                    validationSchema={validationSchema} >
-                    {({handleSubmit, isValid, isSubmitting, dirty}) => (
-                        <Form className="ui form" onSubmit={handleSubmit} autoComplete='off' >
-                            <Field placeholder='Display Name' name="displayName" type='text' />
-                            <Field as='textarea' name="bio" placeholder='Your bio here' />
-                            <Button type="submit" loading={isSubmitting} color='green' content='Submit' disabled={!isValid || !dirty} onClick={() => handleSubmit} />
-                        </Form>
-                        // <Button loading={isSubmitting} />
-                    )}
-                </Formik>
-                </>
+            <Grid>
+                <Grid.Column width={16}>
+                    <Formik
+                        initialValues={initialValues} 
+                        onSubmit={ (values:Partial<Profile>) => handleFormSubmit(values)}
+                        validationSchema={validationSchema} >
+                        {({isValid, isSubmitting, dirty}) => (
+                            <Form className="ui form" autoComplete='off' >
+                                <MyTextInput placeholder={"Display Name"} name={"displayName"} />
+                                <MyTextArea placeholder={"Your Bio"} name={"bio"} rows={2} />
+                                <Button type="submit" loading={isSubmitting} color='green' content='Submit' disabled={!isValid || !dirty} />
+                            </Form>
+                        )}
+                    </Formik>
+                </Grid.Column>
+            </Grid>
             )}
         </>
     )

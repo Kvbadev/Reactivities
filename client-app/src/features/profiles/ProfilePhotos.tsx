@@ -53,6 +53,8 @@ export default observer( function ProfilePhotos({profile}:Props) {
                 {addPhotoMode ? (
                     <PhotoUploadWidget uploadPhoto={handlePhotoUpload} loading={uploading}/>
                 ) : (
+                    <>
+                    {profile.photos?.length != 0 && 
                     <Tab.Pane>
                         <Card.Group itemsPerRow={5}>
                             {profile.photos?.map(photo => (
@@ -82,6 +84,8 @@ export default observer( function ProfilePhotos({profile}:Props) {
                             ))}
                         </Card.Group>
                     </Tab.Pane>
+                    }
+                    </>
                 )}
             </Grid.Column>
         </Grid>
