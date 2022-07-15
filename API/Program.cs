@@ -57,6 +57,7 @@ builder.Services.AddControllers(opt => {
     opt.Filters.Add(new AuthorizeFilter(policy));
 });
 
+//User Accessor
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 //Fluent validation
