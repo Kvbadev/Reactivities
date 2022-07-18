@@ -3,6 +3,7 @@ import React, {useState } from "react";
 import { Tab } from "semantic-ui-react";
 import { Profile } from "../../app/models/profile";
 import { useStore } from "../../app/stores/store";
+import ProfileActivities from "./ProfileActivities";
 import ProfileEditForm from "./ProfileEditForm";
 import ProfileFollowings from "./ProfileFollowings";
 import ProfilePhotos from "./ProfilePhotos";
@@ -17,7 +18,7 @@ export default observer( function ProfileContent({profile}:Props) {
     const panes = [
         {menuItem: 'About', render: () => <Tab.Pane><ProfileEditForm editMode={editMode} setEditMode={setEditMode}/></Tab.Pane>},
         {menuItem: 'Photos', render: () => <Tab.Pane><ProfilePhotos profile={profile}/></Tab.Pane>},
-        {menuItem: 'Events', render: () => <Tab.Pane>Events Content</Tab.Pane>},
+        {menuItem: 'Events', render: () => <Tab.Pane><ProfileActivities /></Tab.Pane>},
         {menuItem: 'Followers', render: () => <ProfileFollowings />},
         {menuItem: 'Following', render: () => <ProfileFollowings />} 
     ]

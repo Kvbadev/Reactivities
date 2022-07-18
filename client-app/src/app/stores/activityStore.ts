@@ -93,6 +93,7 @@ export default class ActivityStore {
         try{
             
             const result = await agent.Activities.list(this.axiosParams);
+
             result.data.forEach(activity => {
                 this.setActivity(activity);
             })

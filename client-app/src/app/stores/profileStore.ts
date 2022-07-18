@@ -1,6 +1,8 @@
+import { format } from "date-fns";
 import { makeAutoObservable, reaction, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Photo, Profile } from "../models/profile";
+import { UserActivity } from "../models/userActivity";
 import { store} from "./store";
 
 export default class ProfileStore {
@@ -11,7 +13,10 @@ export default class ProfileStore {
     loadingFollowings = false;
     updating = false;
     followings: Profile[] = [];
-    activeTab = 0;
+    activeTab: number = 0;
+    events: UserActivity[] = [];
+    activeEvent = 0;
+    loadingEvents = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -27,10 +32,30 @@ export default class ProfileStore {
                 }
             }
         )
+
+        reaction(
+            () => this.activeEvent,
+            activeEvent => {
+                if(activeEvent < 3 && activeEvent >= 0){
+                    let predicate = '';
+                    if(activeEvent === 0) predicate = 'past';
+                    else if(activeEvent === 1) predicate = 'future';
+                    if(activeEvent === 2) predicate = 'host';
+
+                    this.loadProfileActivities(predicate);
+                }
+                else this.events = [];
+
+            }
+        )
     }
 
     setActiveTab = (activeTab: any) => {
         this.activeTab = activeTab;
+    }
+
+    setActiveEvent = (activeEvent: any) => {
+        this.activeEvent = activeEvent;
     }
 
     get isCurrentUser() {
@@ -167,6 +192,22 @@ export default class ProfileStore {
         } catch(error){
             console.log(error);
             runInAction(() => this.loadingFollowings = false)
+        }
+    }
+
+    loadProfileActivities = async (predicate: string) => {
+        this.loadingEvents = true;
+        try{
+            const events = await agent.Profiles.getProfileActivities(this.profile!.username, predicate);
+            runInAction(() => {
+                this.events = events;
+                this.loadingEvents = false;
+            })
+
+
+        } catch (error) {
+            console.log(error);
+            this.loadingEvents = false;
         }
     }
 }
