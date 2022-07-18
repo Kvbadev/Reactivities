@@ -12,30 +12,29 @@ public class ActivitiesList
 {
     public class Query : IRequest<Result<List<UserActivityDto>>?>
     {
-        public string? Predicate;
+        public string? Predicate { get; set; }
+        public string? Username { get; set; }
     }
 
     public class Handler : IRequestHandler<Query, Result<List<UserActivityDto>>?>
     {
-        private readonly IUserAccessor _userAccessor;
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        public Handler(DataContext context, IUserAccessor userAccessor, IMapper mapper)
+        public Handler(DataContext context, IMapper mapper)
         {
             _mapper = mapper;
             _context = context;
-            _userAccessor = userAccessor;
         }
 
         public async Task<Result<List<UserActivityDto>>?> Handle(Query request, CancellationToken cancellationToken)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == request.Username);
+            if(user == null) return null;
 
             var query = _context.Activities!
-                .Include(a => a.Attendees)!.ThenInclude(u => u.AppUser)
-                .Where(x => x.Attendees!.Any(f => f.AppUser!.UserName == _userAccessor.getUsername()))
+                .Where(x => x.Attendees!.Any(f => f.AppUser!.UserName == request.Username))
                 .OrderBy(d => d.Date)
-                .ProjectTo<UserActivityDto>(_mapper.ConfigurationProvider,
-                new {currentUsername = _userAccessor.getUsername()})
+                .ProjectTo<UserActivityDto>(_mapper.ConfigurationProvider)
                 .AsQueryable();
 
             if(request.Predicate == "past")
@@ -48,11 +47,10 @@ public class ActivitiesList
             }
             else if(request.Predicate == "hosting")
             {
-                query = query.Where(x => x.HostUsername == _userAccessor.getUsername());
+                query = query.Where(x => x.HostUsername == request.Username);
             }
 
             return Result<List<UserActivityDto>>.Success(new List<UserActivityDto>(await query.ToListAsync()));
-
         }
     }
 }

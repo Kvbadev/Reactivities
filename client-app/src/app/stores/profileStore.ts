@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { makeAutoObservable, reaction, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Photo, Profile } from "../models/profile";
@@ -40,8 +39,7 @@ export default class ProfileStore {
                     let predicate = '';
                     if(activeEvent === 0) predicate = 'past';
                     else if(activeEvent === 1) predicate = 'future';
-                    if(activeEvent === 2) predicate = 'host';
-
+                    else if(activeEvent === 2) predicate = 'hosting';
                     this.loadProfileActivities(predicate);
                 }
                 else this.events = [];
@@ -155,7 +153,6 @@ export default class ProfileStore {
         try{
             await agent.Profiles.updateFollowing(username);
             store.activityStore.updateAttendeeFollowing(username);
-            console.log(username, this.profile!.username, store.userStore.user?.username);
             runInAction(() => {
                 if(this.profile && this.profile.username !== store.userStore.user?.username && this.profile.username === username){
                     following ? this.profile.followersCount! ++

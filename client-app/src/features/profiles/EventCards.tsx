@@ -1,14 +1,16 @@
 import { format } from "date-fns";
 import { observer } from "mobx-react-lite";
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { Card, Grid, Image, Tab } from "semantic-ui-react";
-import { useStore } from "../../app/stores/store";
+import { Card, Image, Tab } from "semantic-ui-react";
+import { UserActivity } from "../../app/models/userActivity";
 
-export default observer( function EventCards() {
-    const {profileStore} = useStore();
-    const {loadingEvents: loading, events} = profileStore;
+interface Props {
+    loading: boolean;
+    events: UserActivity[];
+}
 
+export default observer( function EventCards({loading, events}:Props) {
     return (
         <Tab.Pane loading={loading}>
             <Card.Group itemsPerRow={4}>

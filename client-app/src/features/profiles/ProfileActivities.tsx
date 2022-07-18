@@ -1,28 +1,28 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect } from "react"
-import { Grid, Header, Segment, Tab } from "semantic-ui-react"
+import { Grid, Header, Tab } from "semantic-ui-react"
 import { useStore } from "../../app/stores/store";
 import EventCards from "./EventCards";
 
 export default observer( function ProfileActivities() {
-    const {profileStore: {setActiveEvent, loadProfileActivities}} = useStore();
+    const {profileStore: {setActiveEvent, loadProfileActivities, events, loadingEvents}} = useStore();
     const panes = [
         {
           menuItem: 'Past Activities',
-          render: () => <EventCards />
+          render: () => <EventCards events={events} loading={loadingEvents}/>
         },
         {
           menuItem: 'Future Activities',
-          render: () => <EventCards />
+          render: () => <EventCards events={events} loading={loadingEvents}/>
         },
         {
           menuItem: 'Hosting',
-          render: () => <EventCards />
+          render: () => <EventCards events={events} loading={loadingEvents}/>
         },
     ]
     useEffect(() => {
         loadProfileActivities('past'); //hard coded past because menu's gonna change its index to 0 anyway
-    },[])
+    },[loadProfileActivities])
 
     return (
         <>
