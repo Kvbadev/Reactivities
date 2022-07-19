@@ -54,7 +54,7 @@ export default observer( function ProfilePhotos({profile}:Props) {
                     <PhotoUploadWidget uploadPhoto={handlePhotoUpload} loading={uploading}/>
                 ) : (
                     <>
-                    {profile.photos?.length != 0 && 
+                    {profile.photos?.length !== 0 && 
                     <Tab.Pane>
                         <Card.Group itemsPerRow={5}>
                             {profile.photos?.map(photo => (

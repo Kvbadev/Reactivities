@@ -2,8 +2,7 @@ import { Formik, Form, Field, FieldProps } from 'formik';
 import { observer } from 'mobx-react-lite'
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom';
-import {Segment, Header, Comment, Button, Loader} from 'semantic-ui-react'
-import MyTextArea from '../../../app/common/form/MyTextArea';
+import {Segment, Header, Comment, Loader} from 'semantic-ui-react'
 import { useStore } from '../../../app/stores/store';
 import * as Yup from 'yup';
 import { formatDistanceToNow } from 'date-fns';
@@ -76,9 +75,9 @@ export default observer(function ActivityDetailedChat({activityId}: Props) {
                             <Comment.Content>
                                 <Comment.Author as={Link} to={`/profiles/${comment.username}`}>{comment.displayName}</Comment.Author>
                                 <Comment.Metadata>
-                                    <div>{formatDistanceToNow(comment.createdAt)} ago</div>
+                                    <div>{formatDistanceToNow(new Date(comment.createdAt))} ago</div>
                                 </Comment.Metadata>
-                                <Comment.Text style={{whiteSpace: 'pre-wrap'}}>{comment.body}</Comment.Text>
+                                <Comment.Text style={{whiteSpace: 'pre-wrap'}}>{comment.body}</Comment.Text> 
                             </Comment.Content>
                         </Comment>
                     ))}

@@ -18,7 +18,7 @@ export default observer( function ProfilePage() {
             setActiveTab(0);
             setActiveEvent(3);
         }
-    }, [loadProfile, username, setActiveTab])
+    }, [loadProfile, username, setActiveTab, setActiveEvent])
 
     if(loadingProfile) return <LoadingComponent content="Loading profile..." />
     return (

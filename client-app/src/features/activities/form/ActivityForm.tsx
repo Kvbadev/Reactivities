@@ -12,11 +12,11 @@ import MyTextArea from "../../../app/common/form/MyTextArea";
 import MySelectInput from "../../../app/common/form/MySelectInput";
 import { categoryOptions } from "../../../app/common/options/categoryOptions";
 import MyDateInput from "../../../app/common/form/MyDateInput";
-import { Activity, ActivityFormValues } from "../../../app/models/activity";
+import { ActivityFormValues } from "../../../app/models/activity";
 
 export default observer( function ActivityForm(){
     const {activityStore} = useStore();
-    const {createActivity, updateActivity, loading, loadActivity, loadingInitial} = activityStore;
+    const {createActivity, updateActivity, loadActivity, loadingInitial} = activityStore;
     const {id} = useParams<{id: string}>();
     const history = useHistory();
 
@@ -75,7 +75,7 @@ export default observer( function ActivityForm(){
                             <MyTextInput placeholder='City' name='city' />
                             <MyTextInput placeholder='Venue' name='venue' />
                             <Button disabled={isSubmitting || !dirty || !isValid} floated="right" positive type="submit" loading={isSubmitting} content='Submit' />
-                            <Button as={Link} to='/activities' floated="right" type="button" content='Cancel' />
+                            <Button as={Link} to={`/activities/${activity.id}`} floated="right" type="button" content='Cancel' />
                         </Form>
                     )}
             </Formik>

@@ -54,10 +54,6 @@ public class Create
                 Body = request.Body
             };
 
-            System.Console.WriteLine("-------------------------");
-            System.Console.WriteLine(user!.Photos!.FirstOrDefault(x => x.IsMain)!.Url);
-            System.Console.WriteLine("-------------------------");
-
             activity.Comments!.Add(comment);
 
             var success = await _context.SaveChangesAsync() > 0;
