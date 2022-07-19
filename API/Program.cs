@@ -49,7 +49,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     if (env == "Development")
     {
         // Use connection string from file.
-        connStr = config.GetConnectionString("DefaultConnection");
+        connStr = builder.Configuration.GetConnectionString("DefaultConnection");
     }
     else
     {
@@ -57,7 +57,7 @@ builder.Services.AddDbContext<DataContext>(options =>
         var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
         // Parse connection URL to connection string for Npgsql
-        connUrl = connUrl.Replace("postgres://", string.Empty);
+        connUrl = connUrl!.Replace("postgres://", string.Empty);
         var pgUserPass = connUrl.Split("@")[0];
         var pgHostPortDb = connUrl.Split("@")[1];
         var pgHostPort = pgHostPortDb.Split("/")[0];
