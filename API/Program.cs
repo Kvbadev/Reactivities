@@ -167,6 +167,7 @@ using (var scope = app.Services.CreateScope()) //Dispose() method ends the scope
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseXContentTypeOptions();
 app.UseReferrerPolicy(o => o.NoReferrer());
 app.UseXXssProtection(o => o.EnabledWithBlockMode());
 app.UseXfo(o => o.Deny());
