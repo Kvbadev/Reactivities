@@ -167,11 +167,32 @@ using (var scope = app.Services.CreateScope()) //Dispose() method ends the scope
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseReferrerPolicy(o => o.NoReferrer());
+app.UseXXssProtection(o => o.EnabledWithBlockMode());
+app.UseXfo(o => o.Deny());
+app.UseCsp(o => o
+    .BlockAllMixedContent()
+    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "http://fonts.gstatic.com"))
+    .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com","https://cdn.jsdelivr.net", "data:"))
+    .FormActions(s => s.Self().CustomSources("https://fonts.gstatic.com"))
+    .FrameAncestors(s => s.Self())
+    .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com"))
+    .ScriptSources(s => s.Self())
+);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else 
+{
+    app.Use(async (context, next) => 
+    {
+        context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000");
+        await next.Invoke();
+    });
 }
 
 // app.UseHttpsRedirection();

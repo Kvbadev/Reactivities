@@ -18,16 +18,13 @@ export default class CommentStore {
                     accessTokenFactory: () => store.userStore.user?.token!
                 })
                 .withAutomaticReconnect()
-                .configureLogging(LogLevel.Information)
+                .configureLogging(LogLevel.Error)
                 .build();
 
             this.hubConnection.start().catch(error => console.log('Error establishing the connection: ', error));
 
             this.hubConnection.on('LoadComments', (comments: ChatComment[]) => {
                 runInAction(() => {
-                    comments.forEach(com => {
-                        console.log(com.createdAt);
-                    })
                     this.comments = comments
                 });
             })
