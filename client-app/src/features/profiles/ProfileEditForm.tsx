@@ -31,7 +31,7 @@ export default observer( function ProfileEditForm({editMode, setEditMode}:Props)
     async function handleFormSubmit (values: Partial<Profile>) {
         try{
             const prevDName = profileStore.profile?.displayName;
-            profileStore.updateUser(values);
+            await profileStore.updateUser(values);
             userStore.updateDisplayname(values);
             activityStore.activityRegistry.forEach((act) => {
                 const toChange = act.attendees.find(x => x.displayName === prevDName);

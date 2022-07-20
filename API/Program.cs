@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen();
 //Cors policy
 builder.Services.AddCors(opt => {
     opt.AddPolicy("CorsPolicy", policy => {
-        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000").AllowCredentials();
+        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://localhost:3000").AllowCredentials();
         // policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
     });
 });
@@ -173,12 +173,12 @@ app.UseXXssProtection(o => o.EnabledWithBlockMode());
 app.UseXfo(o => o.Deny());
 app.UseCsp(o => o
     .BlockAllMixedContent()
-    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "http://fonts.gstatic.com"))
+    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "http://fonts.gstatic.com", "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI="))
     .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com","https://cdn.jsdelivr.net", "data:"))
     .FormActions(s => s.Self().CustomSources("https://fonts.gstatic.com"))
     .FrameAncestors(s => s.Self())
-    .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com"))
-    .ScriptSources(s => s.Self())
+    .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com", "data:", "https://www.facebook.com/", "https://platform-lookaside.fbsbx.com/platform/profilepic/"))
+    .ScriptSources(s => s.Self().CustomSources("https://connect.facebook.net/en_US/sdk.js", "sha256-oWppSlbHKP/YVLb/6k8ZCiIMOFfHfc+thlYZKIBh0fI="))
 );
 
 // Configure the HTTP request pipeline.
@@ -196,7 +196,7 @@ else
     });
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

@@ -7,6 +7,8 @@ import { store } from "./store";
 
 export default class UserStore {
     user: User | null = null;
+    fbAccessToken: string | null = null;
+    fbLoading = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -32,6 +34,7 @@ export default class UserStore {
         store.commonStore.setToken(null);
         window.localStorage.removeItem('jwt');
         this.user = null;
+        store.activityStore.clearActivities();
         history.push('/');
     }
 
@@ -65,6 +68,47 @@ export default class UserStore {
     updateDisplayname = async (updatedProfile: Partial<Profile>) => {
         if(this.user){
             this.user.displayName = updatedProfile.displayName as string;
+        }
+    }
+
+    getFacebookLoginStatus = async () => {
+        setTimeout(() => { //to prevent FB is not defined
+            window.FB.getLoginStatus(response => {
+                if (response.status === 'connected'){
+                    this.fbAccessToken = response.authResponse.accessToken;
+                }
+            })
+        })
+    }
+
+    facebookLogin = () => {
+        this.fbLoading = true;
+        const apiLogin = (accessToken: string) => {
+            agent.Account.fbLogin(accessToken).then(user => {
+                store.commonStore.setToken(user.token);
+                runInAction(() => {
+                    this.user = user;
+                    this.fbLoading = false;
+                })
+                history.push('/activities');
+            }).catch(error => {
+                console.log(error);
+                runInAction(() => this.fbLoading = false);
+            })
+        }
+        if(this.fbAccessToken){
+            console.log('object');
+            apiLogin(this.fbAccessToken);
+            console.log('object2');
+        } else {
+            window.FB.login(response => {
+                try{
+                    apiLogin(response.authResponse.accessToken);
+                } catch(error) {
+                    runInAction(()=>this.fbLoading = false);
+                    console.log(error);
+                }
+            },{scope: 'public_profile,email'})
         }
     }
 }

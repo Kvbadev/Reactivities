@@ -17,6 +17,7 @@ import ModalContainer from '../common/modals/ModalContainer';
 import ProfilePage from '../../features/profiles/ProfilePage';
 import PrivateRoute from './PrivateRoute';
 
+
 function App() {
   const location = useLocation();
   const {commonStore, userStore} = useStore();
@@ -24,8 +25,11 @@ function App() {
   useEffect(() => {
     if(commonStore.token){
       userStore.getUser().finally(() => commonStore.setAppLoaded())
-    } else {
-      commonStore.setAppLoaded();
+    }
+    else {
+      userStore.getFacebookLoginStatus()
+        .then(() => {commonStore.setAppLoaded()})
+        .catch(error => {console.log(error);commonStore.setAppLoaded()})
     }
   }, [commonStore, userStore]);
 

@@ -106,6 +106,11 @@ export default class ActivityStore {
         }
     }
 
+    clearActivities = () => {
+        this.selectedActivity = undefined;
+        this.activityRegistry = new Map<string, Activity>();
+    }
+
     setPagination = (pagination: Pagination) => {
         this.pagination = pagination;
     }
