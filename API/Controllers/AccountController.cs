@@ -44,6 +44,7 @@ public class AccountController : ControllerBase
 
         if(res.Succeeded)
         {
+            await SetRefreshToken(user);
             return CreateUserObject(user);
         }
 
@@ -73,6 +74,7 @@ public class AccountController : ControllerBase
 
         if (res.Succeeded)
         {
+            await SetRefreshToken(user);
             return CreateUserObject(user);
         }
         return BadRequest("Problem registering user");
@@ -84,6 +86,8 @@ public class AccountController : ControllerBase
     {
         var user = await _userManager.Users.Include(p => p.Photos)
             .FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
+        
+        await SetRefreshToken(user!);
         return CreateUserObject(user!);
     }
 
@@ -130,7 +134,43 @@ public class AccountController : ControllerBase
 
         if(!result.Succeeded) return BadRequest("Problem creating user account");
 
+        await SetRefreshToken(user);
         return CreateUserObject(user);
+    }
+
+    [Authorize]
+    [HttpPost("refreshToken")]
+    public async Task<ActionResult<UserDto>> RefreshToken()
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
+        var user = await _userManager.Users
+            .Include(r => r.RefreshTokens)
+            .Include(p => p.Photos)
+            .FirstOrDefaultAsync(x => x.UserName == User.FindFirstValue(ClaimTypes.Name));
+        
+        if(user == null) return Unauthorized();
+
+        var oldToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
+
+        if(oldToken != null && !oldToken.IsActive) return Unauthorized();
+
+        return CreateUserObject(user);
+    }
+
+    private async Task SetRefreshToken(AppUser user)
+    {
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        user.RefreshTokens.Add(refreshToken);
+        await _userManager.UpdateAsync(user);
+
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+
+        Response.Cookies.Append("refreshToken", refreshToken.Token!, cookieOptions);
     }
 
     private UserDto CreateUserObject(AppUser user)

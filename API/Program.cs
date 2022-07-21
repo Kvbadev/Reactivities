@@ -32,7 +32,12 @@ builder.Services.AddSwaggerGen();
 //Cors policy
 builder.Services.AddCors(opt => {
     opt.AddPolicy("CorsPolicy", policy => {
-        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://localhost:3000").AllowCredentials();
+        policy
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithExposedHeaders("WWW-Authenticate", "Pagination")
+            .WithOrigins("http://localhost:3000", "https://localhost:3000")
+            .AllowCredentials();
         // policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
     });
 });
@@ -114,7 +119,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = key,
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero //default value is 5 minutes
         };
         opt.Events = new JwtBearerEvents
         {
