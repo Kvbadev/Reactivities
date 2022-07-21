@@ -173,7 +173,7 @@ app.UseXXssProtection(o => o.EnabledWithBlockMode());
 app.UseXfo(o => o.Deny());
 app.UseCsp(o => o
     .BlockAllMixedContent()
-    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "http://fonts.gstatic.com", "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI="))
+    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "http://fonts.gstatic.com", "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI=", "sha256-yR2gSI6BIICdRRE2IbNP1SJXeA5NYPbaM32i/Y8eS9o="))
     .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com","https://cdn.jsdelivr.net", "data:"))
     .FormActions(s => s.Self().CustomSources("https://fonts.gstatic.com"))
     .FrameAncestors(s => s.Self())
