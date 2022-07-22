@@ -18,6 +18,7 @@ using Infrastructure.Security;
 using Application.Interfaces;
 using Infrastructure.Photos;
 using API.SignalR;
+using Infrastructure.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,9 +107,11 @@ builder.Services.AddFluentValidation(config => {
 //Identity
 builder.Services.AddIdentityCore<AppUser>(opt => {
     opt.Password.RequireNonAlphanumeric = false;
-})
+    opt.SignIn.RequireConfirmedEmail = true;
+    })
     .AddEntityFrameworkStores<DataContext>()
-    .AddSignInManager<SignInManager<AppUser>>();
+    .AddSignInManager<SignInManager<AppUser>>()
+    .AddDefaultTokenProviders();
 
 //JWT token
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
@@ -152,6 +155,8 @@ builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>()
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 
 builder.Services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+
+builder.Services.AddScoped<EmailSender>();
 
 
 var app = builder.Build();
